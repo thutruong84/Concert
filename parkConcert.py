@@ -138,6 +138,41 @@ def single(seatData):
     ticket = str(row) + col1
     customer(name,email,ticket,bill)
 
+# Create a menu for buying bulk seats
+def bulk(seatData):
+    numberOfTicket = input("How many tickets do you want to buy?")
+    rowArray = []
+    colArray = []
+    rowAndColArray = []
+    for i in range(int(numberOfTicket)):
+        check = False
+        while (check == False):
+            print("Due to COVID 19 resstriction, odd rows are blocked. Pick row 0 or even row only.")
+            row = input("Enter the row (in number) of seat " + str(i+1) + " you want:")
+            row = int(row)
+            col1 = input("Enter the column (in letter) of seat " + str(i+1) + " you want:")
+            #convert the letter column index to number column index
+            col = ord(col1) - 97
+            check = seatConstraint(row,col,seatData)
+        rowArray.append(row)
+        colArray.append(col)
+        rowAndColArray.append(str(row)+col1)
+    print("All seats you chose have been reserved for you.")
+    totalSeatPurchased = 0
+    for i in range(int(numberOfTicket)):
+        ReserveSeat(rowArray[i],colArray[i], seatData)
+        print("********************************************")
+        print("Billing for seat " + str(i+1))
+        bill = Billing(rowArray[i])
+        totalSeatPurchased += bill
+
+    print("To purchase the tickets, please enter")
+    name = input("Name:")
+    email = input("Email address:")
+    print("You have purchased the tickets successfully. Your info is saved.")
+
+    customer(name,email,rowAndColArray,totalSeatPurchased)
+
 
 # create a menu function to display menu option and get user input
 def menu():
@@ -192,4 +227,5 @@ def menu():
 #         print("*** Your choice is not valid ***")
 #         choice = menu()
 
-single(seatData)
+bulk(seatData)
+#single(seatData)
