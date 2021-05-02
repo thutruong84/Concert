@@ -169,6 +169,7 @@ def bulk(seatData):
     print("To purchase the tickets, please enter")
     name = input("Name:")
     email = input("Email address:")
+    rowAndColArray = ','.join(rowAndColArray)
     print("You have purchased the tickets successfully. Your info is saved.")
 
     customer(name,email,rowAndColArray,totalSeatPurchased)
@@ -183,49 +184,117 @@ def menu():
     print("[D]isplay all purchases")
     print("[Q]uit this program")
     option = input("Choose an option:")
+    option = option.upper()
     return option
 
 
 # initialize the main menu and get user input
-# choice = menu()
+choice = menu()
 
-# # create a while loop that will quit the program if user enters "q"
+# create a while loop that will quit the program if user enters "q"
 
-# while (choice != "Q"):
+while (choice != "Q"):
 
-#     # case a: search by full name
-#     if choice == "V":
-#         PrintSeating(seatData)
-#         print("Front Seat (rows 0 - 4) price $80")
-#         print("Middle Seat (rows 5 - 10) price $50")
-#         print("Back Seat (rows 11-19) price $25")
-#         choice = menu()
+    # case a: search by full name
+    if choice == "V":
+        PrintSeating(seatData)
+        print("Front Seat (rows 0 - 4) price $80")
+        print("Middle Seat (rows 5 - 10) price $50")
+        print("Back Seat (rows 11-19) price $25")
+        choice = menu()
 
-#     # case b: search by last name
-#     elif choice == "B":
-#         singleBulk = input("Do you want to buy a single ticket or bulk? S or B:")
-#         if singleBulk == "S":
-            
-#         print("Due to COVID 19 resstriction, odd rows are blocked. Pick row 0 or even row only.")
-#         row = input("Enter the row (in number) of the seat you want:")
-#         row = int(row)
-#         col = input("Enter the column (in letter) of the seat you want:")
-#         checkSeat = seatConstraint(row,col,seatData)
-#         if checkSeat == False:
-#             print("false")
-#             choice = "B"
-#         choice = menu()
+    # case b: search by last name
+    elif choice == "B":
+        singleBulk = input("Do you want to buy a single ticket or bulk? S or B:")
+        singleBulk = singleBulk.upper()
+        if singleBulk == "S":
+            single(seatData)
+        elif singleBulk == "B":
+            bulk(seatData)
+        else:
+            print("Your choice is not valid.")
+        choice = menu()
     
-#     # case c: search by first name    
-#     elif choice == "c":
-#         name = processName()
-#         searchName(name,firstName)
-#         choice = menu()
+    # case c: search by first name    
+    elif choice == "S":
+        # full path
+        pathToFile = "/Users/Admin/customer.json"
 
-#     # if user inputs any letter other than a,b,c or q  
-#     else:
-#         print("*** Your choice is not valid ***")
-#         choice = menu()
 
-bulk(seatData)
-#single(seatData)
+        # try to open a file and throw an error if it is not found
+        try:
+            jsonFile = open(pathToFile, 'r')
+        except OSError:
+            print("ERROR: Unable to open the file %s" % pathToFile)
+
+        # read the whole json file into a variable
+        customerList = json.load(jsonFile)
+
+        # create an empty dictionary
+        customerDictionary = {}
+
+        # loop json list of data and put each name and birthday into a dictionary
+        for elem in customerList:
+
+            # fetch name and birthday
+            name = elem["Name"]
+            ticket = elem["Ticket"]
+            customerDictionary[name] = ticket
+
+        # get user's input    
+        userName = input("Enter a name to display the tickets purchased:")
+        # print value in the dictionary by giving it a string name as the key if the name exists
+        if userName in customerDictionary:
+            print("Ticket's purchased by " + userName + ": "  + customerDictionary[userName])
+            
+
+        # print no information found if name is not in the dictionary    
+        else:
+            print("No information for " + userName + " found.")
+
+
+        choice = menu()
+
+    # case c: search by first name    
+    elif choice == "D":
+        # full path
+        pathToFile = "/Users/Admin/customer.json"
+
+        # try to open a file and throw an error if it is not found
+        try:
+            jsonFile = open(pathToFile, 'r')
+        except OSError:
+            print("ERROR: Unable to open the file %s" % pathToFile)
+
+        # read the whole json file into a variable
+        purchaseList = json.load(jsonFile)
+
+        # create an empty dictionary
+        purchaseDictionary = {}
+
+        # loop json list of data and put each name and birthday into a dictionary
+        for elem in purchaseList:
+
+            # fetch name and birthday
+            name = elem["Name"]
+            bill = elem["Bill"]
+            purchaseDictionary[name] = bill
+
+        print("Below are all purchases:")
+
+        # print key and value of purchaseDictionary
+        for key, value in purchaseDictionary.items():
+            print("Purchase for customer " + key + " is $" + str(value))
+        
+        # make an array of purchases
+        purchaseArray = list(purchaseDictionary.values())
+        totalIncome = sum(purchaseArray)
+        print("Total amount of income that the venue has made is $" + str(totalIncome))
+
+        choice = menu()
+
+
+    # if user inputs any letter other than a,b,c or q  
+    else:
+        print("*** Your choice is not valid ***")
+        choice = menu()
